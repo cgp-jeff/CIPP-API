@@ -8,7 +8,7 @@ function Invoke-ExecServicePrincipals {
     [CmdletBinding()]
     param($Request, $TriggerMetadata)
 
-    $TenantFilter = $env:TenantId
+    $TenantFilter = $env:TenantID
 
     $Success = $true
 
@@ -36,7 +36,11 @@ function Invoke-ExecServicePrincipals {
                 if ($Request.Query.AppId) {
                     $Action = 'Get'
                     $Results = New-GraphGetRequest -Uri "https://graph.microsoft.com/beta/servicePrincipals(appId='$($Request.Query.AppId)')" -tenantid $TenantFilter -NoAuthCheck $true
-                } else {
+                } elseif ($Request.Query.Id) {
+                    $Action = 'Get'
+                    $Results = New-GraphGetRequest -Uri "https://graph.microsoft.com/beta/servicePrincipals/$($Request.Query.Id)" -tenantid $TenantFilter -NoAuthCheck $true
+                }
+                else {
                     $Action = 'List'
                     $Results = New-GraphGetRequest -Uri 'https://graph.microsoft.com/beta/servicePrincipals?$top=999&$orderby=displayName&$count=true' -ComplexFilter -tenantid $TenantFilter -NoAuthCheck $true
                 }
