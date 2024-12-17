@@ -6,7 +6,7 @@ name: Build and deploy Powershell project to Azure Function App - cippy7bck
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 env:
