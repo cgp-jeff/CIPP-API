@@ -24,7 +24,7 @@ function Get-CIPPAlertEntraLicenseUtilization {
             $P1Usage = ($P1Used / $P1Entitled) * 100
             $P1Overage = $P1Used - $P1Entitled
 
-            if ($P1Usage -gt $Threshold -and $P1Overage -ge 5) {
+            if ($P1Usage -gt $Threshold -and $P1Overage -ge 6) {
                 $Alerts.Add("P1 License utilization is at $([math]::Round($P1Usage,2))% (Using $P1Used of $P1Entitled licenses, over by $P1Overage)")
             }
         }
@@ -36,7 +36,7 @@ function Get-CIPPAlertEntraLicenseUtilization {
             $P2Usage = ($P2Used / $P2Entitled) * 100
             $P2Overage = $P2Used - $P2Entitled
 
-            if ($P2Usage -gt $Threshold -and $P2Overage -ge 5) {
+            if ($P2Usage -gt $Threshold -and $P2Overage -ge 6) {
                 $Alerts.Add("P2 License utilization is at $([math]::Round($P2Usage,2))% (Using $P2Used of $P2Entitled licenses, over by $P2Overage)")
             }
         }
