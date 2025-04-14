@@ -8,11 +8,18 @@ function Get-CIPPAlertEntraLicenseUtilization {
         [Parameter(Mandatory = $false)]
         [Alias('input')]
         $InputValue,
+
+        [Parameter(Mandatory = $false)]
+        [Alias('input2')]
+        $InputValue2,
+
         $TenantFilter
     )
     try {
         # Set threshold with fallback to 110%
         $Threshold = if ($InputValue) { [int]$InputValue } else { 110 }
+        # Set license count threshold with fallback to 5
+        $LCThreshold = if ($InputValue2) { [int]$InputValue2 } else { 5 }
 
         $LicenseData = New-GraphGETRequest -uri 'https://graph.microsoft.com/beta/reports/azureADPremiumLicenseInsight' -tenantid $($TenantFilter)
         $Alerts = [System.Collections.Generic.List[string]]::new()
@@ -24,7 +31,7 @@ function Get-CIPPAlertEntraLicenseUtilization {
             $P1Usage = ($P1Used / $P1Entitled) * 100
             $P1Overage = $P1Used - $P1Entitled
 
-            if ($P1Usage -gt $Threshold -and $P1Overage -ge 1) {
+            if ($P1Usage -gt $Threshold -and $P1Overage -ge $LCThreshold) {
                 $Alerts.Add("P1 License utilization is at $([math]::Round($P1Usage,2))% (Using $P1Used of $P1Entitled licenses, over by $P1Overage)")
             }
         }
@@ -36,13 +43,13 @@ function Get-CIPPAlertEntraLicenseUtilization {
             $P2Usage = ($P2Used / $P2Entitled) * 100
             $P2Overage = $P2Used - $P2Entitled
 
-            if ($P2Usage -gt $Threshold -and $P2Overage -ge 1) {
+            if ($P2Usage -gt $Threshold -and $P2Overage -ge $LCThreshold) {
                 $Alerts.Add("P2 License utilization is at $([math]::Round($P2Usage,2))% (Using $P2Used of $P2Entitled licenses, over by $P2Overage)")
             }
         }
 
         if ($Alerts.Count -gt 0) {
-            $AlertData = "License Over-utilization Alert (Threshold: $Threshold%, Min Overage: 1): $($Alerts -join ' | ')"
+            $AlertData = "License Over-utilization Alert (Threshold: $Threshold%, Min Overage: $LCThreshold): $($Alerts -join ' | ')"
             Write-AlertTrace -cmdletName $MyInvocation.MyCommand -tenantFilter $TenantFilter -data $AlertData
         }
 
